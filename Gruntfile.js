@@ -8,8 +8,8 @@ module.exports = function(grunt) {
         separator: ';'
       },
       dist: {
-        src: ['client/env/*.js','client/scripts/*.js'],
-        dest: 'dist/client/<%= pkg.name %>.js'
+        src: ['public/client/**/*.js'],
+        dest: 'public/dist/<%= pkg.name %>.js'
       }
       /* END SOLUTION */
     },
@@ -19,13 +19,13 @@ module.exports = function(grunt) {
         options: {
           reporter: 'spec'
         },
-        src: ['server/spec/*.js']
+        src: ['test/**/*.js']
       }
     },
 
     nodemon: {
       dev: {
-        script: 'server/basic-server.js'
+        script: 'server.js'
       }
     },
 
@@ -36,7 +36,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'dist/client/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
+          'public/dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
         }
       }
       /* END SOLUTION */
@@ -46,11 +46,11 @@ module.exports = function(grunt) {
       files: [
         /* START SOLUTION */
         'Gruntfile.js',
-        'client/**/*.js'
-        // 'public/**/*.js',
-        // 'lib/**/*.js',
-        // './*.js',
-        // 'spec/**/*.js'
+        'app/**/*.js',
+        'public/**/*.js',
+        'lib/**/*.js',
+        './*.js',
+        'spec/**/*.js'
         /* ELSE
         // Add filespec list here
         END SOLUTION */
@@ -59,8 +59,8 @@ module.exports = function(grunt) {
         force: 'true',
         jshintrc: '.jshintrc',
         ignores: [
-          // 'public/lib/**/*.js',
-          'dist/client/*.js'
+          'public/lib/**/*.js',
+          'public/dist/**/*.js'
         ]
       }
     },
@@ -72,7 +72,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'dist/styles/style.min.css': 'client/styles/*.css'
+          'public/dist/style.min.css': 'public/style.css'
         }
       }
       /* END SOLUTION */
@@ -81,8 +81,8 @@ module.exports = function(grunt) {
     watch: {
       scripts: {
         files: [
-          'client/**/*.js'
-          // 'public/lib/**/*.js',
+          'public/client/**/*.js',
+          'public/lib/**/*.js',
         ],
         tasks: [
           'concat',
@@ -90,29 +90,23 @@ module.exports = function(grunt) {
         ]
       },
       css: {
-        files: 'client/styles/*.css',
+        files: 'public/*.css',
         tasks: ['cssmin']
-      }/* START SOLUTION */,
-      server: {
-        files: 'server/*.js',
-        tasks: ['mochaTest']
       }
-      
-      /* END SOLUTION */
     },
 
-    // shell: {
-    //   prodServer: {
-    //     /* START SOLUTION */
-    //     command: 'git push azure master',
-    //     options: {
-    //       stdout: true,
-    //       stderr: true,
-    //       failOnError: true
-    //     }
-    //     /* END SOLUTION */
-    //   }
-    // },
+    shell: {
+      prodServer: {
+        /* START SOLUTION */
+        command: 'git push azure master',
+        options: {
+          stdout: true,
+          stderr: true,
+          failOnError: true
+        }
+        /* END SOLUTION */
+      }
+    },
   });
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -121,7 +115,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-mocha-test');
-  // grunt.loadNpmTasks('grunt-shell');
+  grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-nodemon');
 
   grunt.registerTask('server-dev', function (target) {
@@ -144,36 +138,35 @@ module.exports = function(grunt) {
   grunt.registerTask('test', [
     /* START SOLUTION */
     'jshint',
-    /* END SOLUTION */ 
+    /* END SOLUTION */
     'mochaTest'
   ]);
 
   grunt.registerTask('build', [
     /* START SOLUTION */
-    'jshint',
     'concat',
     'uglify',
     'cssmin'
     /* END SOLUTION */
   ]);
 
-  // grunt.registerTask('upload', function(n) {
-  //   if(grunt.option('prod')) {
-  //     /* START SOLUTION */
-  //     grunt.task.run([ 'shell:prodServer' ]);
-  //     /* ELSE
-  //     // add your production server task here
-  //     END SOLUTION */
-  //   } else {
-  //     grunt.task.run([ 'server-dev' ]);
-  //   }
-  // });
+  grunt.registerTask('upload', function(n) {
+    if(grunt.option('prod')) {
+      /* START SOLUTION */
+      grunt.task.run([ 'shell:prodServer' ]);
+      /* ELSE
+      // add your production server task here
+      END SOLUTION */
+    } else {
+      grunt.task.run([ 'server-dev' ]);
+    }
+  });
 
   grunt.registerTask('deploy', [
     /* START SOLUTION */
     'test',
-    'build'
-    // 'upload'
+    'build',
+    'upload'
     /* ELSE
     // add your deploy tasks here
     END SOLUTION */
